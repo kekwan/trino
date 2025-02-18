@@ -20,6 +20,7 @@ import io.airlift.units.DataSize;
 import io.airlift.units.Duration;
 import io.trino.spi.resourcegroups.SchedulingPolicy;
 
+import javax.xml.crypto.Data;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -49,6 +50,7 @@ public class ResourceGroupSpec
     private final Optional<Boolean> jmxExport;
     private final Optional<Duration> softCpuLimit;
     private final Optional<Duration> hardCpuLimit;
+    private final Optional<DataSize> softPhysicalDataScanLimit;
 
     @JsonCreator
     public ResourceGroupSpec(
@@ -63,7 +65,8 @@ public class ResourceGroupSpec
             @JsonProperty("subGroups") Optional<List<ResourceGroupSpec>> subGroups,
             @JsonProperty("jmxExport") Optional<Boolean> jmxExport,
             @JsonProperty("softCpuLimit") Optional<Duration> softCpuLimit,
-            @JsonProperty("hardCpuLimit") Optional<Duration> hardCpuLimit)
+            @JsonProperty("hardCpuLimit") Optional<Duration> hardCpuLimit,
+            @JsonProperty("softPhysicalDataScanLimit") Optional<DataSize> softPhysicalDataScanLimit)
     {
         this.softCpuLimit = requireNonNull(softCpuLimit, "softCpuLimit is null");
         this.hardCpuLimit = requireNonNull(hardCpuLimit, "hardCpuLimit is null");
@@ -93,6 +96,9 @@ public class ResourceGroupSpec
             this.softMemoryLimit = Optional.of(DataSize.valueOf(softMemoryLimit));
             this.softMemoryLimitFraction = Optional.empty();
         }
+
+        this.softPhysicalDataScanLimit = requireNonNull(softPhysicalDataScanLimit, "softPhysicalDataScanLimit is null");
+        // this.softPhysicalDataScanLimit = Optional.of(DataSize.valueOf(String.valueOf(softPhysicalDataScanLimit)));
 
         this.subGroups = ImmutableList.copyOf(subGroups.orElse(ImmutableList.of()));
         Set<ResourceGroupNameTemplate> names = new HashSet<>();
@@ -161,6 +167,10 @@ public class ResourceGroupSpec
         return hardCpuLimit;
     }
 
+    public Optional<DataSize> getSoftPhysicalDataScanLimit() {
+        return softPhysicalDataScanLimit;
+    }
+
     @Override
     public boolean equals(Object other)
     {
@@ -181,7 +191,8 @@ public class ResourceGroupSpec
                 subGroups.equals(that.subGroups) &&
                 jmxExport.equals(that.jmxExport) &&
                 softCpuLimit.equals(that.softCpuLimit) &&
-                hardCpuLimit.equals(that.hardCpuLimit));
+                hardCpuLimit.equals(that.hardCpuLimit) &&
+                softPhysicalDataScanLimit.equals(that.softPhysicalDataScanLimit));
     }
 
     // Subgroups not included, used to determine whether a group needs to be reconfigured
@@ -199,7 +210,8 @@ public class ResourceGroupSpec
                 schedulingWeight.equals(other.schedulingWeight) &&
                 jmxExport.equals(other.jmxExport) &&
                 softCpuLimit.equals(other.softCpuLimit) &&
-                hardCpuLimit.equals(other.hardCpuLimit));
+                hardCpuLimit.equals(other.hardCpuLimit) &&
+                softPhysicalDataScanLimit.equals(other.softPhysicalDataScanLimit));
     }
 
     @Override
@@ -216,7 +228,8 @@ public class ResourceGroupSpec
                 subGroups,
                 jmxExport,
                 softCpuLimit,
-                hardCpuLimit);
+                hardCpuLimit,
+                softPhysicalDataScanLimit);
     }
 
     @Override
@@ -233,6 +246,7 @@ public class ResourceGroupSpec
                 .add("jmxExport", jmxExport)
                 .add("softCpuLimit", softCpuLimit)
                 .add("hardCpuLimit", hardCpuLimit)
+                .add("softPhysicalDataScanLimit", softPhysicalDataScanLimit)
                 .toString();
     }
 }
