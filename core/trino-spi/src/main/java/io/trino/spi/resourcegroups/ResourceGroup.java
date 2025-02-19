@@ -54,7 +54,7 @@ public interface ResourceGroup
     /**
      *
      * Threshold on total physical data scan usage after which new queries
-     *  will queue instead of startings
+     *  will queue instead of starting.
      */
     void setSoftPhysicalDataScanLimitBytes(long limit);
 

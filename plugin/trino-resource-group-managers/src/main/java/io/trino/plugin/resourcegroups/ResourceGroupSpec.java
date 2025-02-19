@@ -75,6 +75,7 @@ public class ResourceGroupSpec
         checkArgument(maxQueued >= 0, "maxQueued is negative");
         this.maxQueued = maxQueued;
         this.softConcurrencyLimit = softConcurrencyLimit;
+        this.softPhysicalDataScanLimit = requireNonNull(softPhysicalDataScanLimit, "softPhysicalDataScanLimit is null");
 
         checkArgument(hardConcurrencyLimit.isPresent() || maxRunning.isPresent(), "Missing required property: hardConcurrencyLimit");
         this.hardConcurrencyLimit = hardConcurrencyLimit.orElseGet(maxRunning::get);
@@ -96,9 +97,6 @@ public class ResourceGroupSpec
             this.softMemoryLimit = Optional.of(DataSize.valueOf(softMemoryLimit));
             this.softMemoryLimitFraction = Optional.empty();
         }
-
-        this.softPhysicalDataScanLimit = requireNonNull(softPhysicalDataScanLimit, "softPhysicalDataScanLimit is null");
-        // this.softPhysicalDataScanLimit = Optional.of(DataSize.valueOf(String.valueOf(softPhysicalDataScanLimit)));
 
         this.subGroups = ImmutableList.copyOf(subGroups.orElse(ImmutableList.of()));
         Set<ResourceGroupNameTemplate> names = new HashSet<>();
